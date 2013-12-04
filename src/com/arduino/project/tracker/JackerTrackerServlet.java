@@ -21,8 +21,11 @@ import org.apache.http.util.EntityUtils;
 
 @SuppressWarnings("serial")
 public class JackerTrackerServlet extends HttpServlet {
-	
-	private final String API_KEY = "AIzaSyB7u5flxCLsAQzypIgbMNbiJzioA1je2A0";
+	// server key AIzaSyDAR1ZuCCUXPLIaO-nXcTojSxbrFFefCcE
+	// AIzaSyDrABM4JmbT2TzBDLMjL_A06B261g8YYgo
+	private final String API_KEY 		= "AIzaSyDAR1ZuCCUXPLIaO-nXcTojSxbrFFefCcE";
+	private final String PROJECT_ID 	= "jacker-tracker";
+	private final String PROJECT_NUMBER = "933606158574";
 	
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -32,9 +35,12 @@ public class JackerTrackerServlet extends HttpServlet {
 		// the url to post info to
 		HttpPost httpPost = new HttpPost("https://android.googleapis.com/gcm/send");
 		
+		httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+		httpPost.setHeader("Authorization", "key="+API_KEY);
+		
 		// the info to post
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
-        nvps.add(new BasicNameValuePair("key", API_KEY));
+        //nvps.add(new BasicNameValuePair("key", API_KEY));
         nvps.add(new BasicNameValuePair("registration_ids", "[ABC]"));
 		
         // encode the info
