@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,28 +20,40 @@ import org.apache.http.util.EntityUtils;
 
 
 @SuppressWarnings("serial")
-public class JackerTrackerServlet extends HttpServlet {
+public class MessageServlet extends BaseServlet {
+	
 	// server key AIzaSyDAR1ZuCCUXPLIaO-nXcTojSxbrFFefCcE
 	// AIzaSyDrABM4JmbT2TzBDLMjL_A06B261g8YYgo
 	private final String API_KEY 		= "AIzaSyDAR1ZuCCUXPLIaO-nXcTojSxbrFFefCcE";
 	private final String PROJECT_ID 	= "jacker-tracker";
 	private final String PROJECT_NUMBER = "933606158574";
 	
+	private static final String PARAMETER_REG_ID 	= "regId";
+	private static final String MESSAGE 			= "msg";
+	
+	
 	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
 		
 		CloseableHttpClient client = HttpClients.createDefault();
 		
-		// the url to post info to
+		// the url and headers to post
 		HttpPost httpPost = new HttpPost("https://android.googleapis.com/gcm/send");
 		
 		httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
 		httpPost.setHeader("Authorization", "key="+API_KEY);
 		
+		// get the registration id of the phone to message
+		String regId = getParameter(req, PARAMETER_REG_ID);
+		
+		// get the message type
+		String msgType = getParameter(req, MESSAGE);
+		
 		// the info to post
 		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
         //nvps.add(new BasicNameValuePair("key", API_KEY));
-        nvps.add(new BasicNameValuePair("registration_ids", "[ABC]"));
+        nvps.add(new BasicNameValuePair("registration_ids", "[" + regId + "]"));
+        nvps.add(new BasicNameValuePair("data.msg", msgType));
 		
         // encode the info
         httpPost.setEntity(new UrlEncodedFormEntity(nvps));
@@ -51,9 +63,17 @@ public class JackerTrackerServlet extends HttpServlet {
 
         // do something with the response
         try {
-            System.out.println(response.getStatusLine());
+            
             HttpEntity entity = response.getEntity();
+            
             // do something useful with the response body
+            
+            // TODO log this
+            System.out.println(response.getStatusLine());
+            System.out.println(EntityUtils.toString(entity));
+            
+            
+            
             // and ensure it is fully consumed
             EntityUtils.consume(entity);
         } finally {
